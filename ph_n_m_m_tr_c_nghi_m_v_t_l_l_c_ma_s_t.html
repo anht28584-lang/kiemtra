@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề Thi Trắc Nghiệm Vật Lý 10 - Lực Ma Sát</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- MathJax v3 Configuration -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            startup: {
+                ready: () => {
+                    MathJax.defaultReady();
+                    MathJax.startup.promise.then(() => {
+                        // MathJax initial render completed
+                        document.body.classList.add('mathjax-ready');
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Hide raw math formulas before MathJax renders to prevent code flashing */
+        .mjx-rendering {
+            visibility: hidden;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between antialiased">
+
+    <!-- Header Navbar -->
+    <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/40 border border-indigo-400/50 flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-atom text-amber-300"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Trắc Nghiệm Vật Lý 10</h1>
+                    <p class="text-xs text-indigo-200">Chủ đề: Lực Ma Sát (10 Câu hỏi có giải thích chi tiết)</p>
+                </div>
+            </div>
+
+            <!-- Score Stats Header Badge -->
+            <div class="flex items-center space-x-3 bg-indigo-800/80 px-4 py-1.5 rounded-full border border-indigo-500/40">
+                <div class="text-xs text-indigo-200 border-r border-indigo-600 pr-3">
+                    Đã làm: <span id="header-progress" class="font-bold text-white">0/10</span>
+                </div>
+                <div class="text-xs text-indigo-200">
+                    Điểm số: <span id="header-score" class="font-bold text-amber-300">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-6xl mx-auto px-4 py-6 flex-grow w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+            <!-- Left: Question Area (3 Cols) -->
+            <div class="lg:col-span-3 space-y-5">
+                
+                <!-- Progress bar -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">Tiến độ</span>
+                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                        <div id="progress-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-300" style="width: 10%;"></div>
+                    </div>
+                    <span id="current-q-index" class="text-sm font-bold text-indigo-600 whitespace-nowrap">Câu 1/10</span>
+                </div>
+
+                <!-- Main Question Box -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-200">
+                    <!-- Question Header -->
+                    <div class="p-5 md:p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-start gap-4">
+                        <div class="flex items-start space-x-3">
+                            <span id="q-number-badge" class="px-3 py-1 bg-indigo-100 text-indigo-700 font-bold text-sm rounded-lg flex-shrink-0 mt-0.5">
+                                Câu 1
+                            </span>
+                            <div id="question-text" class="text-slate-800 font-semibold text-base md:text-lg leading-relaxed tex2jax_process">
+                                Loading câu hỏi...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Answer Options -->
+                    <div id="options-container" class="p-5 md:p-6 space-y-3.5">
+                        <!-- Dynamic Options will be rendered here -->
+                    </div>
+
+                    <!-- Instant Explanation Panel (Shown upon answering) -->
+                    <div id="explanation-box" class="hidden p-5 md:p-6 bg-amber-50/70 border-t border-amber-200/80 animate-fade-in">
+                        <div class="flex items-center space-x-2 text-amber-800 font-bold text-base mb-2">
+                            <i class="fa-solid fa-lightbulb text-amber-500 text-lg"></i>
+                            <span>Lời giải chi tiết:</span>
+                        </div>
+                        <div id="explanation-text" class="text-slate-700 text-sm leading-relaxed space-y-2 tex2jax_process">
+                            <!-- Explanation text inserted dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-2">
+                    <button id="btn-prev" onclick="changeQuestion(-1)" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium rounded-xl shadow-sm transition flex items-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                        <span>Câu trước</span>
+                    </button>
+
+                    <button id="btn-reset" onclick="resetQuiz()" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-rose-600 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Làm lại từ đầu</span>
+                    </button>
+
+                    <button id="btn-next" onclick="changeQuestion(1)" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow transition flex items-center space-x-2">
+                        <span>Câu tiếp</span>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Question Palette & Score Board (1 Col) -->
+            <div class="space-y-5">
+                
+                <!-- Score summary card -->
+                <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-5 shadow-sm border border-indigo-800">
+                    <h2 class="text-xs uppercase font-bold text-indigo-300 tracking-wider mb-3">Kết quả hiện tại</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/60 text-center">
+                            <div class="text-2xl font-extrabold text-emerald-400" id="correct-count">0</div>
+                            <div class="text-[11px] text-slate-400 font-medium mt-0.5">Đúng</div>
+                        </div>
+                        <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/60 text-center">
+                            <div class="text-2xl font-extrabold text-rose-400" id="wrong-count">0</div>
+                            <div class="text-[11px] text-slate-400 font-medium mt-0.5">Sai</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Question Grid -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-sm font-bold text-slate-700 mb-3 flex items-center justify-between">
+                        <span>Danh sách câu hỏi</span>
+                        <span class="text-xs font-normal text-slate-400">10 câu</span>
+                    </h2>
+                    
+                    <div id="question-grid" class="grid grid-cols-5 gap-2.5">
+                        <!-- 10 Question Buttons Rendered Here -->
+                    </div>
+
+                    <div class="mt-5 pt-4 border-t border-slate-100 text-[11px] text-slate-500 space-y-1.5">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                            <span>Đã chọn ĐÚNG</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                            <span>Đã chọn SAI</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span>
+                            <span>Đang làm</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-slate-200 inline-block"></span>
+                            <span>Chưa trả lời</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Physics Formula Reference Quick Box -->
+                <div class="bg-indigo-50/60 border border-indigo-100 p-4 rounded-2xl">
+                    <h3 class="text-xs font-bold text-indigo-900 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-bookmark text-indigo-500"></i>
+                        <span>Công thức cần nhớ</span>
+                    </h3>
+                    <ul class="text-xs text-indigo-950 space-y-1.5 tex2jax_process">
+                        <li>• $F_{mst} = \mu_t \cdot N$</li>
+                        <li>• $F_{msn, \max} = \mu_n \cdot N$</li>
+                        <li>• $N = m \cdot g$ (Mặt phẳng ngang)</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Completion Modal -->
+    <div id="completion-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl animate-fade-in border border-slate-100">
+            <div class="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto text-2xl mb-4">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-1">Hoàn thành bài thi!</h2>
+            <p class="text-slate-500 text-sm mb-6">Bạn đã trả lời hết tất cả 10 câu hỏi trắc nghiệm Lực ma sát.</p>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-xs text-slate-400 font-medium">Số điểm đạt được</div>
+                    <div id="modal-score" class="text-3xl font-extrabold text-indigo-600 mt-1">0/10</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400 font-medium">Tỷ lệ chính xác</div>
+                    <div id="modal-percentage" class="text-3xl font-extrabold text-emerald-500 mt-1">0%</div>
+                </div>
+            </div>
+
+            <div class="flex space-x-3">
+                <button onclick="closeModal()" class="flex-1 px-4 py-2.5 border border-slate-300 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition">
+                    Xem lại bài
+                </button>
+                <button onclick="resetQuiz(); closeModal();" class="flex-1 px-4 py-2.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 shadow transition">
+                    Thử lại ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <p>Ứng dụng ôn tập trắc nghiệm Vật Lý 10 • Hỗ trợ hiển thị công thức MathJax chuẩn hóa</p>
+    </footer>
+
+    <!-- JavaScript Quiz Logic -->
+    <script>
+        // 10 Physics Questions Data on Friction Force
+        const quizData = [
+            {
+                id: 1,
+                question: "Lực ma sát trượt xuất hiện khi nào?",
+                options: [
+                    "A. Khi một vật nằm yên trên bề mặt của vật khác.",
+                    "B. Khi một vật trượt trên bề mặt của vật khác.",
+                    "C. Khi một vật lăn trên bề mặt của vật khác.",
+                    "D. Khi một vật có xu hướng chuyển động nhưng chưa chuyển động."
+                ],
+                correct: 1, // Index B
+                explanation: "<strong>Lực ma sát trượt</strong> xuất hiện ở mặt tiếp xúc khi một vật <em>trượt</em> trên bề mặt của một vật khác, có hướng ngược với chiều chuyển động trượt tương đối của vật."
+            },
+            {
+                id: 2,
+                question: "Công thức tính độ lớn của lực ma sát trượt là công thức nào sau đây?",
+                options: [
+                    "A. $F_{mst} = \\mu_t \\cdot N$",
+                    "B. $F_{mst} = \\mu_t \\cdot m$",
+                    "C. $F_{mst} = k \\cdot \\Delta l$",
+                    "D. $F_{mst} = m \\cdot g$"
+                ],
+                correct: 0, // Index A
+                explanation: "Độ lớn của lực ma sát trượt tỉ lệ với độ lớn của áp lực $N$ lên mặt tiếp xúc:<br>$$F_{mst} = \\mu_t \\cdot N$$ Trong đó $\\mu_t$ là hệ số ma sát trượt (không có đơn vị), $N$ là áp lực ép lên bề mặt tiếp xúc (tính bằng Newton)."
+            },
+            {
+                id: 3,
+                question: "Một vật có khối lượng $m = 2\\,\\text{kg}$ đặt trên mặt phẳng nằm ngang. Hệ số ma sát trượt giữa vật và mặt sàn là $\\mu = 0{,}1$. Lấy $g = 10\\,\\text{m/s}^2$. Độ lớn của lực ma sát trượt khi vật trượt trên sàn là:",
+                options: [
+                    "A. $0{,}2\\,\\text{N}$",
+                    "B. $2\\,\\text{N}$",
+                    "C. $20\\,\\text{N}$",
+                    "D. $1\\,\\text{N}$"
+                ],
+                correct: 1, // Index B
+                explanation: "Vật chuyển động trên mặt phẳng nằm ngang nên độ lớn áp lực bằng trọng lực của vật:<br>$$N = P = m \\cdot g = 2 \\times 10 = 20\\,\\text{N}$$<br>Lực ma sát trượt được tính theo công thức:<br>$$F_{mst} = \\mu \\cdot N = 0{,}1 \\times 20 = 2\\,\\text{N}$$"
+            },
+            {
+                id: 4,
+                question: "Đặc điểm nào sau đây <strong>KHÔNG ĐÚNG</strong> đối với lực ma sát trượt?",
+                options: [
+                    "A. Tỉ lệ thuận với độ lớn của áp lực $N$.",
+                    "B. Phụ thuộc vào bản chất và tình trạng của hai bề mặt tiếp xúc.",
+                    "C. Tỉ lệ thuận với diện tích bề mặt tiếp xúc.",
+                    "D. Không phụ thuộc vào tốc độ chuyển động của vật (trong phạm vi vận tốc vừa phải)."
+                ],
+                correct: 2, // Index C
+                explanation: "Lực ma sát trượt <strong>KHÔNG phụ thuộc</strong> vào diện tích bề mặt tiếp xúc cũng như tốc độ của vật. Các yếu tố ảnh hưởng trực tiếp đến lực ma sát trượt chỉ bao gồm: bản chất/tình trạng bề mặt tiếp xúc và độ lớn áp lực $N$."
+            },
+            {
+                id: 5,
+                question: "Một thùng hàng nặng $m = 50\\,\\text{kg}$ đang đứng yên trên sàn nhà nằm ngang. Hệ số ma sát nghỉ cực đại giữa thùng hàng và mặt sàn là $\\mu_n = 0{,}4$. Lấy $g = 10\\,\\text{m/s}^2$. Để thùng hàng bắt đầu trượt, người ta phải tác dụng lực kéo theo phương ngang có độ lớn tối thiểu là bao nhiêu?",
+                options: [
+                    "A. $200\\,\\text{N}$",
+                    "B. $50\\,\\text{N}$",
+                    "C. $20\\,\\text{N}$",
+                    "D. $500\\,\\text{N}$"
+                ],
+                correct: 0, // Index A
+                explanation: "Để vật bắt đầu trượt, lực kéo $F$ theo phương ngang phải lớn hơn hoặc bằng lực ma sát nghỉ cực đại $F_{msn, \\max}$:<br>$$F_{msn, \\max} = \\mu_n \\cdot N = \\mu_n \\cdot m \\cdot g$$<br>Thay số ta có:<br>$$F_{\\min} = 0{,}4 \\times 50 \\times 10 = 200\\,\\text{N}$$"
+            },
+            {
+                id: 6,
+                question: "So sánh độ lớn giữa lực ma sát lăn và lực ma sát trượt trong cùng điều kiện tải trọng và bề mặt tiếp xúc:",
+                options: [
+                    "A. Lực ma sát lăn lớn hơn lực ma sát trượt rất nhiều.",
+                    "B. Lực ma sát lăn luôn bằng lực ma sát trượt.",
+                    "C. Lực ma sát lăn rất nhỏ so với lực ma sát trượt.",
+                    "D. Không so sánh được vì chúng có bản chất khác nhau."
+                ],
+                correct: 2, // Index C
+                explanation: "Lực ma sát lăn xuất hiện khi một vật lăn trên bề mặt vật khác và có độ lớn <strong>rất nhỏ hơn</strong> lực ma sát trượt (nhỏ hơn hàng chục đến hàng trăm lần). Vì vậy, trong máy móc người ta thường thay ma sát trượt bằng ma sát lăn (dùng ổ bi) để giảm hao mòn và lực cản."
+            },
+            {
+                id: 7,
+                question: "Một ô tô đang di chuyển trên đường thẳng nằm ngang với vận tốc không đổi (chuyển động thẳng đều). Lực ma sát giữa lốp xe phát động và mặt đường khi xe tăng tốc hướng về phía nào?",
+                options: [
+                    "A. Hướng ngược chiều chuyển động của xe.",
+                    "B. Hướng cùng chiều chuyển động của xe.",
+                    "C. Hướng thẳng đứng vuông góc với mặt đường.",
+                    "D. Bằng 0 vì xe chuyển động thẳng đều."
+                ],
+                correct: 1, // Index B
+                explanation: "Khi bánh xe phát động quay, điểm tiếp xúc của lốp xe có xu hướng trượt về phía sau so với mặt đường. Lực ma sát nghỉ tác dụng từ mặt đường lên lốp xe sẽ phát động hướng <strong>về phía trước (cùng chiều chuyển động)</strong>, giúp đẩy xe tiến lên. Đây là ví dụ điển hình của lực ma sát đóng vai trò là lực phát động có lợi."
+            },
+            {
+                id: 8,
+                question: "Một kéo lực $F = 15\\,\\text{N}$ theo phương ngang làm cho một vật có khối lượng $m = 3\\,\\text{kg}$ trượt đều trên sàn nhà. Lấy $g = 10\\,\\text{m/s}^2$. Hệ số ma sát trượt $\\mu_t$ giữa vật và sàn là:",
+                options: [
+                    "A. $\\mu_t = 0{,}2$",
+                    "B. $\\mu_t = 0{,}3$",
+                    "C. $\\mu_t = 0{,}5$",
+                    "D. $\\mu_t = 0{,}15$"
+                ],
+                correct: 2, // Index C
+                explanation: "Vì vật trượt đều nên theo Định luật I Niutơn, hợp lực tác dụng lên vật bằng 0 theo phương ngang:<br>$$F = F_{mst} \\Rightarrow 15\\,\\text{N} = \\mu_t \\cdot N$$<br>Mặt khác áp lực $N = m \\cdot g = 3 \\times 10 = 30\\,\\text{N}$.<br>Do đó hệ số ma sát trượt là:<br>$$\\mu_t = \\frac{F_{mst}}{N} = \\frac{15}{30} = 0{,}5$$"
+            },
+            {
+                id: 9,
+                question: "Trường hợp nào dưới đây biểu hiện lực ma sát có <strong>HẠI</strong>?",
+                options: [
+                    "A. Lực ma sát giúp bàn chân không bị trượt khi bước đi.",
+                    "B. Lực ma sát giữa má phanh và vành xe giúp xe dừng lại khi phanh.",
+                    "C. Lực ma sát làm xích và đĩa xe đạp bị mòn sau thời gian sử dụng.",
+                    "D. Lực ma sát giữa sợi dây và tang quay giúp giữ chặt vật nặng."
+                ],
+                correct: 2, // Index C
+                explanation: "Lực ma sát làm mòn các chi tiết máy (như xích, đĩa xe đạp, piston...) và sinh nhiệt gây tốn năng lượng là lực ma sát có hại. Trong trường hợp này, người ta phải thường xuyên tra dầu mỡ để giảm ma sát."
+            },
+            {
+                id: 10,
+                question: "Độ lớn của lực ma sát nghỉ $F_{msn}$ thay đổi như thế nào khi tăng dần lực kéo $F$ tác dụng vào vật đứng yên (nhưng vật vẫn chưa trượt)?",
+                options: [
+                    "A. $F_{msn}$ luôn giữ nguyên không đổi.",
+                    "B. $F_{msn}$ tăng dần và luôn bằng độ lớn lực kéo $F$.",
+                    "C. $F_{msn}$ giảm dần về $0$.",
+                    "D. $F_{msn}$ luôn bằng hệ số ma sát trượt nhân với áp lực $N$."
+                ],
+                correct: 1, // Index B
+                explanation: "Khi vật nằm yên trên mặt phẳng, lực ma sát nghỉ có tác dụng cân bằng với thành phần lực tác dụng song song với mặt tiếp xúc. Do đó, khi tăng dần lực kéo $F$ (vật vẫn chưa chuyển động), độ lớn lực ma sát nghỉ $F_{msn}$ sẽ **tăng tương ứng và luôn có độ lớn bằng $F$** cho đến khi đạt giá trị cực đại $F_{msn, \\max} = \\mu_n \\cdot N$."
+            }
+        ];
+
+        // State management variables
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(quizData.length).fill(null); // stores index of selected option
+        let isSubmitted = false;
+
+        // Initialize Application
+        window.addEventListener('DOMContentLoaded', () => {
+            renderQuestionPalette();
+            loadQuestion(currentQuestionIndex);
+        });
+
+        // Trigger MathJax re-rendering safely for updated HTML content
+        function triggerMathJax() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err));
+            }
+        }
+
+        // Render Question Grid palette on the sidebar
+        function renderQuestionPalette() {
+            const gridContainer = document.getElementById('question-grid');
+            gridContainer.innerHTML = '';
+
+            quizData.forEach((q, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => jumpToQuestion(index);
+                
+                let classes = "w-full aspect-square rounded-xl text-xs font-bold transition flex items-center justify-center border ";
+                
+                if (index === currentQuestionIndex) {
+                    classes += "ring-2 ring-indigo-600 ring-offset-1 ";
+                }
+
+                if (userAnswers[index] === null) {
+                    classes += "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200";
+                } else {
+                    const isCorrect = userAnswers[index] === q.correct;
+                    if (isCorrect) {
+                        classes += "bg-emerald-500 border-emerald-600 text-white shadow-sm";
+                    } else {
+                        classes += "bg-rose-500 border-rose-600 text-white shadow-sm";
+                    }
+                }
+
+                btn.className = classes;
+                btn.innerText = index + 1;
+                gridContainer.appendChild(btn);
+            });
+
+            updateScoresAndProgress();
+        }
+
+        // Load Question content into DOM
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const q = quizData[index];
+
+            // Update Header badges
+            document.getElementById('current-q-index').innerText = `Câu ${index + 1}/${quizData.length}`;
+            document.getElementById('q-number-badge').innerText = `Câu ${index + 1}`;
+            document.getElementById('progress-bar').style.width = `${((index + 1) / quizData.length) * 100}%`;
+
+            // Question Text
+            document.getElementById('question-text').innerHTML = q.question;
+
+            // Options container
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const answered = userAnswers[index] !== null;
+            const selectedOptIndex = userAnswers[index];
+
+            q.options.forEach((optText, optIdx) => {
+                const optionBtn = document.createElement('div');
+                
+                let baseStyle = "w-full p-4 rounded-xl border text-left font-medium transition cursor-pointer flex items-center justify-between group ";
+
+                if (!answered) {
+                    baseStyle += "bg-white border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 text-slate-700 shadow-sm";
+                    optionBtn.onclick = () => selectAnswer(optIdx);
+                } else {
+                    optionBtn.classList.add('cursor-default');
+                    
+                    if (optIdx === q.correct) {
+                        // Correct option always highlighted green when answered
+                        baseStyle += "bg-emerald-50 border-emerald-500 text-emerald-900 shadow-sm ring-1 ring-emerald-500";
+                    } else if (optIdx === selectedOptIndex && selectedOptIndex !== q.correct) {
+                        // Selected option is WRONG -> Red
+                        baseStyle += "bg-rose-50 border-rose-500 text-rose-900 shadow-sm ring-1 ring-rose-500";
+                    } else {
+                        // Unselected neutral options
+                        baseStyle += "bg-slate-50 border-slate-200 text-slate-400 opacity-60";
+                    }
+                }
+
+                optionBtn.className = baseStyle;
+
+                // Option content inside
+                let statusIconHtml = '';
+                if (answered) {
+                    if (optIdx === q.correct) {
+                        statusIconHtml = `<span class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs flex-shrink-0 ml-2"><i class="fa-solid fa-check"></i></span>`;
+                    } else if (optIdx === selectedOptIndex) {
+                        statusIconHtml = `<span class="w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs flex-shrink-0 ml-2"><i class="fa-solid fa-xmark"></i></span>`;
+                    }
+                }
+
+                optionBtn.innerHTML = `
+                    <div class="tex2jax_process flex-grow pr-2">${optText}</div>
+                    ${statusIconHtml}
+                `;
+
+                optionsContainer.appendChild(optionBtn);
+            });
+
+            // Explanation box setup
+            const explanationBox = document.getElementById('explanation-box');
+            if (answered) {
+                explanationBox.classList.remove('hidden');
+                document.getElementById('explanation-text').innerHTML = q.explanation;
+            } else {
+                explanationBox.classList.add('hidden');
+                document.getElementById('explanation-text').innerHTML = '';
+            }
+
+            // Update Navigation Buttons state
+            document.getElementById('btn-prev').disabled = index === 0;
+            document.getElementById('btn-next').innerText = index === quizData.length - 1 ? "Xem kết quả" : "Câu tiếp";
+
+            renderQuestionPalette();
+
+            // Typeset LaTeX after rendering new content
+            setTimeout(() => {
+                triggerMathJax();
+            }, 30);
+        }
+
+        // Handle User Answer Selection
+        function selectAnswer(optIdx) {
+            if (userAnswers[currentQuestionIndex] !== null) return; // Prevent re-answering
+
+            userAnswers[currentQuestionIndex] = optIdx;
+            
+            // Re-render question view immediately to show instant feedback (green/red & explanation)
+            loadQuestion(currentQuestionIndex);
+
+            // Check if all questions are completed
+            const completedCount = userAnswers.filter(a => a !== null).length;
+            if (completedCount === quizData.length) {
+                setTimeout(() => {
+                    showCompletionModal();
+                }, 800);
+            }
+        }
+
+        // Navigate relative (+1 or -1)
+        function changeQuestion(delta) {
+            const newIndex = currentQuestionIndex + delta;
+
+            if (newIndex >= 0 && newIndex < quizData.length) {
+                loadQuestion(newIndex);
+            } else if (newIndex >= quizData.length) {
+                showCompletionModal();
+            }
+        }
+
+        // Jump directly to specific question
+        function jumpToQuestion(index) {
+            loadQuestion(index);
+        }
+
+        // Update top stats header & sidebar numbers
+        function updateScoresAndProgress() {
+            const answeredCount = userAnswers.filter(a => a !== null).length;
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            userAnswers.forEach((ans, idx) => {
+                if (ans !== null) {
+                    if (ans === quizData[idx].correct) {
+                        correctCount++;
+                    } else {
+                        wrongCount++;
+                    }
+                }
+            });
+
+            document.getElementById('header-progress').innerText = `${answeredCount}/${quizData.length}`;
+            document.getElementById('header-score').innerText = `${correctCount * 10}/100`;
+            
+            document.getElementById('correct-count').innerText = correctCount;
+            document.getElementById('wrong-count').innerText = wrongCount;
+        }
+
+        // Show Modal at the end
+        function showCompletionModal() {
+            let correctCount = 0;
+            userAnswers.forEach((ans, idx) => {
+                if (ans === quizData[idx].correct) correctCount++;
+            });
+
+            document.getElementById('modal-score').innerText = `${correctCount}/${quizData.length}`;
+            document.getElementById('modal-percentage').innerText = `${Math.round((correctCount / quizData.length) * 100)}%`;
+            
+            document.getElementById('completion-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('completion-modal').classList.add('hidden');
+        }
+
+        // Reset all answers
+        function resetQuiz() {
+            userAnswers = new Array(quizData.length).fill(null);
+            currentQuestionIndex = 0;
+            loadQuestion(0);
+        }
+    </script>
+</body>
+</html>
